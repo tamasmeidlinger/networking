@@ -95,6 +95,17 @@
       - [MPLS](#mpls)
     - [VRF](#vrf)
     - [Routing Protocols](#routing-protocols)
+      - [**RIP**](#rip)
+      - [**OSPF**](#ospf)
+      - [**BGP**](#bgp)
+      - [**MPLS**](#mpls-1)
+      - [**EIGRP**](#eigrp)
+  - [Switching](#switching)
+    - [STP](#stp)
+    - [VLAN](#vlan)
+    - [VXLAN](#vxlan)
+    - [Link Aggregation](#link-aggregation)
+    - [MAC Address Tables](#mac-address-tables)
 - [Resources](#resources)
   - [Overall](#overall)
   - [Network Devices](#network-devices-1)
@@ -104,11 +115,14 @@
 
 # To-do
 
+- [ ] First start understanding stuff deeper and look into useful resources
+- [ ] CLI stuff and other
 - [ ] SAN (Storage Area Network) -> Network Types
 - [ ] Include links from roadmaps to useful resources to relevant topics
 - [ ] Maybe a FAQ
 - [ ] Cisco Packet Tracer - Try it out
 - [ ] Classless Inter-Domain Routing (CIDR)
+- [ ] STP and Layer X switches
 
 # Terminology
 
@@ -739,6 +753,10 @@ This reduces the size of routing tables and simplifies routing by representing s
 
 ## Routing
 
+Routing is the **process of selecting a path for traffic to travel across one or more networks from source to destination**.
+
+Routers perform this function by **examining the destination IP address of each packet** and **consulting a routing table** to determine where to forward it next. Routing can be done **statically**, where paths are manually configured, or **dynamically**, where routers automatically discover and update paths using **routing protocols**.
+
 ### Static vs Dynamic Routing
 
 **Static routing** involves **manually configuring fixed routes** in a router's routing table, which do not change unless an administrator updates them. It is simple and predictable, but **does not adapt automatically** to network changes or failures.
@@ -778,7 +796,89 @@ Each VRF acts like a completely separate virtual router, meaning **traffic in on
 
 ### Routing Protocols
 
+#### **RIP**
 
+RIP, or **Routing Information Protocol**, is **one of the oldest dynamic routing protocols**, using a **distance-vector algorithm to determine the best path based on hop count** (the number of routers a packet must pass through to reach its destination).
+
+It has a **maximum hop count of 15**, making it unsuitable for large networks. RIP is simple to configure but has largely been replaced by more efficient protocols like OSPF and EIGRP in modern networks.
+
+#### **OSPF**
+
+OSPF, or **Open Shortest Path First**, is a **link-state interior gateway routing protocol** used within **a single autonomous system or organization**.
+
+It works by having each router build a complete map of the network topology and then calculate the shortest path to every destination using Dijkstra's algorithm. OSPF converges quickly after network changes and is widely used in medium to large enterprise networks.
+
+**-- Breakdown --**
+
+**1.** An **Interior Gateway Protocol (IGP)** is a **routing protocol** used inside a single **Autonomous System (AS)**.
+
+**2.** An **Autonomous System** is essentially a network (or collection of networks) managed by one organization.
+
+**3. Interior** = Routing within an organization's network.
+
+- The opposite is an **Exterior Gateway Protocol (EGP)**, which handles routing **between autonomous systems**. **BGP** is the most common example.
+
+**4. Gateway** = A device that connects different networks.
+
+**5. Link-State:**
+- **Link**: A connection between two routers.
+- **State**: Information about that connection, such as whether it is working and its cost.
+
+In a link-state routing protocol, routers share information about their connections with other routers.
+
+#### **BGP**
+
+BGP, or **Border Gateway Protocol**, is the **routing protocol that powers the Internet by exchanging routing information between autonomous systems**, i.e., the large networks operated by ISPs, corporations, and other organizations.
+
+It is a **path-vector protocol** that makes **routing decisions based on network policies**, **path attributes**, and **rules** rather than simply the shortest path. **BGP is responsible for ensuring that traffic can reach any two points on the global Internet**.
+
+#### **MPLS**
+
+MPLS, or **Multiprotocol Label Switching**, is a **technique for speeding up network traffic** by using **short labels** to direct packets along **predetermined paths** rather than making complex routing decisions at each hop.
+
+When a packet enters an MPLS network, it is **assigned a label**, and **subsequent routers forward it based on that label without needing to inspect the IP header**. Service providers widely use MPLS to manage traffic efficiently and deliver services such as VPNs and quality-of-service guarantees.
+
+#### **EIGRP**
+
+EIGRP, or **Enhanced Interior Gateway Routing Protocol**, is an **advanced distance-vector routing protocol** developed by Cisco that **combines features of both distance-vector and link-state protocols**.
+
+It uses a **composite metric based on bandwidth, delay, load, and reliability** to calculate the best route and converges faster than traditional distance-vector protocols. EIGRP is efficient in terms of bandwidth usage and CPU load, making it popular in Cisco-based enterprise networks.
+
+## Switching
+
+Switching is **the process of forwarding data frames within a local network based on MAC addresses**.
+
+A network switch receives incoming frames and **sends them only to the port connected to the intended destination device**, unlike a hub, which broadcasts to all ports. Switching forms the foundation of modern LAN design and can be enhanced with features like VLANs, STP, and link aggregation.
+
+### STP
+
+STP, or **Spanning Tree Protocol**, is a **network protocol** that **prevents loops** in Ethernet networks by creating a **logical tree topology from a physically redundant network**.
+
+Without STP, multiple paths between switches could cause broadcast storms that would bring a network down. STP works by electing a root bridge and blocking redundant paths, re-enabling them only if the primary path fails.
+
+### VLAN
+
+A VLAN, or **Virtual Local Area Network**, is a **logical subdivision of a physical network** that groups devices together regardless of their physical location.
+
+VLANs allow network administrators to segment traffic, improve security, and reduce broadcast domains without needing separate physical switches. Devices in different VLANs cannot communicate directly without going through a router or a Layer 3 switch.
+
+### VXLAN
+
+VXLAN, or **Virtual Extensible LAN**, is a **network virtualization technology** that **extends Layer 2 networks over a Layer 3 infrastructure by encapsulating Ethernet frames inside UDP packets**.
+
+It was created to overcome the scalability limitations of traditional VLANs, which support a maximum of 4,096 network segments, by supporting up to 16 million virtual network identifiers. VXLAN is widely used in data centers and cloud environments where large numbers of isolated virtual networks need to coexist on shared physical infrastructure.
+
+### Link Aggregation
+
+Link aggregation is a technique that **combines multiple physical network connections between two devices into a single logical link**, increasing bandwidth and providing redundancy.
+
+If one physical link fails, the others continue to carry traffic without interruption. It is standardized under IEEE 802.3ad (LACP) and is commonly used between switches, servers, and storage devices to improve both performance and reliability.
+
+### MAC Address Tables
+
+A MAC address table, also called a **CAM (Content Addressable Memory)** table, is a **database maintained by a network switch** that **maps MAC addresses to the specific ports those devices are connected to**.
+
+When a frame arrives, the switch looks up the destination MAC address in this table to determine which port to forward the frame to. If the address is not found, the switch floods the frame to all ports until it learns the correct mapping.
 
 # Resources
 
